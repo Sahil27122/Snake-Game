@@ -12,8 +12,8 @@ const highScoreElement = document.querySelector("#high-score")
 const scoreElement = document.querySelector("#score")
 const timeElement = document.querySelector("#time")
 
-const blockHeight = 50;
-const blockWidth = 50;
+const blockHeight = 30;
+const blockWidth = 30;
 
 let highScore = localStorage.getItem("highScore") || 0
 let score = 0
@@ -89,6 +89,18 @@ function render() {
         return;
     }
 
+    // Self collision logic - check if head hits any body segment
+    for (let i = 0; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+            clearInterval(intervalId)
+
+            modal.style.display = "flex"
+            startGameModal.style.display = "none"
+            gameOverModal.style.display = "flex"
+            return;
+        }
+    }
+
     // Food consume logic
     if (head.x == food.x && head.y == food.y) {
         blocks[`${food.x}-${food.y}`].classList.remove("food")
@@ -100,9 +112,10 @@ function render() {
         score += 10
         scoreElement.innerText = score
 
-        if(score>highScore){
+        if (score > highScore) {
             highScore = score
             localStorage.setItem("highScore", highScore.toString())
+            highScoreElement.innerText = highScore
         }
 
     }
@@ -123,17 +136,17 @@ function render() {
 //     render()
 // }, 300)
 
-startButton.addEventListener("click", ()=>{
+startButton.addEventListener("click", () => {
     modal.style.display = "none"
-    intervalId = setInterval(()=> {render()}, 200)
-    timerIntervalId = setInterval(()=>{
+    intervalId = setInterval(() => { render() }, 200)
+    timerIntervalId = setInterval(() => {
         let [min, sec] = time.split("-").map(Number)
 
-        if(sec==59){
-            min+=1
-            sec=0
-        }else{
-            sec+=1
+        if (sec == 59) {
+            min += 1
+            sec = 0
+        } else {
+            sec += 1
         }
 
         time = `${min}-${sec}`
@@ -161,20 +174,28 @@ function restartGame() {
 
     modal.style.display = "none"
     direction = "down"
-    snake = [{x:1, y:3}]
+    snake = [{ x: 1, y: 3 }]
     food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
-    intervalId = setInterval(()=> {render()}, 300)
+    intervalId = setInterval(() => { render() }, 300)
 }
 
 addEventListener("keydown", (event) => {
-    // console.log(event.key)
-    if (event.key == "ArrowUp") {
+    // Prevent reversing into opposite direction
+    // W or ArrowUp = Up
+    if ((event.key == "ArrowUp" || event.key == "w" || event.key == "W") && direction !== "down") {
         direction = "up"
-    } else if (event.key == "ArrowDown") {
+    } 
+    // S or ArrowDown = Down
+    else if ((event.key == "ArrowDown" || event.key == "s" || event.key == "S") && direction !== "up") {
         direction = "down"
-    } else if (event.key == "ArrowLeft") {
+    } 
+    // A or ArrowLeft = Left
+    else if ((event.key == "ArrowLeft" || event.key == "a" || event.key == "A") && direction !== "right") {
         direction = "left"
-    } else if (event.key == "ArrowRight") {
+    } 
+    // D or ArrowRight = Right
+    else if ((event.key == "ArrowRight" || event.key == "d" || event.key == "D") && direction !== "left") {
         direction = "right"
     }
 })
+
