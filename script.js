@@ -12,8 +12,8 @@ const highScoreElement = document.querySelector("#high-score")
 const scoreElement = document.querySelector("#score")
 const timeElement = document.querySelector("#time")
 
-const blockHeight = 30;
-const blockWidth = 30;
+const blockHeight = window.innerWidth <= 768 ? 25 : 30;
+const blockWidth = window.innerWidth <= 768 ? 25 : 30;
 
 let highScore = localStorage.getItem("highScore") || 0
 let score = 0
@@ -199,3 +199,24 @@ addEventListener("keydown", (event) => {
     }
 })
 
+
+// Mobile touch controls
+const controlButtons = document.querySelectorAll('.control-btn');
+
+controlButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        const newDirection = button.getAttribute('data-direction');
+        
+        if (newDirection === 'up' && direction !== 'down') {
+            direction = 'up';
+        } else if (newDirection === 'down' && direction !== 'up') {
+            direction = 'down';
+        } else if (newDirection === 'left' && direction !== 'right') {
+            direction = 'left';
+        } else if (newDirection === 'right' && direction !== 'left') {
+            direction = 'right';
+        }
+    });
+});
