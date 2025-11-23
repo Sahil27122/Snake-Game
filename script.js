@@ -27,10 +27,6 @@ const rows = Math.floor(board.clientHeight / blockHeight);
 let intervalId = null;
 let timerIntervalId = null;
 
-let food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
-
-const blocks = [];
-
 let snake = [
     {
         x: 1, y: 3
@@ -42,6 +38,30 @@ let snake = [
     //     x: 1, y: 5
     // }
 ]
+
+// let food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
+
+// logic to ensure the food does not spawn on the snake's body
+function spawnFood() {
+    // All available blocks
+    let possiblePositions = [];
+    for(let row=0; row<rows; row++){
+        for(let col=0; col<cols; col++){
+            possiblePositions.push({x: row, y: col});
+        }
+    }
+    // Remove any where the snake is
+    possiblePositions = possiblePositions.filter(pos => {
+        return !snake.some(segment => segment.x === pos.x && segment.y === pos.y);
+    });
+    // Choose random
+    const index = Math.floor(Math.random() * possiblePositions.length);
+    return possiblePositions[index];
+}
+
+let food = spawnFood();
+
+const blocks = [];
 
 let direction = 'down'
 
@@ -104,7 +124,8 @@ function render() {
     // Food consume logic
     if (head.x == food.x && head.y == food.y) {
         blocks[`${food.x}-${food.y}`].classList.remove("food")
-        food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
+        // food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
+        food = spawnFood();
         blocks[`${food.x}-${food.y}`].classList.add("food")
 
         snake.unshift(head)
@@ -175,7 +196,8 @@ function restartGame() {
     modal.style.display = "none"
     direction = "down"
     snake = [{ x: 1, y: 3 }]
-    food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
+    // food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
+    food = spawnFood();
     intervalId = setInterval(() => { render() }, 300)
 }
 
